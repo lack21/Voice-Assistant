@@ -1,0 +1,67 @@
+# lear
+# Voice Assistant
+# Version 2.0
+
+import speech_recognition as sr
+import pyttsx3 as pt
+from datetime import datetime
+
+engine = pt.init()
+
+voices = engine.getProperty("voices")
+# 0 - man voice, 1 - woman voice
+engine.setProperty("voice", voices[1].id)
+
+recognizer = sr.Recognizer()
+
+# Text
+greetings = ["hello", "hi"]
+introducing = ["introduce", "who are you"]
+time = ["what time is it", "tell me the time"]
+day = ["what day is it", "tell me the day"]
+goodbye = ["goodbye", "bye", "see you later", "close", "exit"]
+
+
+def Voicer():
+    with sr.Microphone() as source:
+        # Start
+        print("\nClearing background noises..")
+        recognizer.adjust_for_ambient_noise(source, duration = 0.6)
+        print("Ask me anything...")
+        recorded_audio = recognizer.listen(source)
+
+    try:
+        text = recognizer.recognize_google(recorded_audio,language = 'en_US')
+        text = text.lower()
+        print('Your message:',format(text))
+
+    except Exception as ex:
+        print(ex)
+
+    # Questions and Answers
+    if [i for i in greetings if i in text]:
+        engine.say("Welcome User!")
+        engine.runAndWait()
+
+    if [i for i in introducing if i in text]:
+        engine.say("Welcome, I am your voice assisstant!")
+        engine.runAndWait()
+
+    if [i for i in time if i in text]:
+        date = datetime.now().strftime("%I:%M:%S %p")
+        engine.say("Now is " + str(date))
+        engine.runAndWait()
+
+    if [i for i in day if i in text]:
+        dayly = datetime.now().strftime("%d:%A")
+        engine.say("Today is " + str(dayly))
+        engine.runAndWait()
+
+    if [i for i in goodbye if i in text]:
+        engine.say("Program is Closing! Have a good day!")
+        engine.runAndWait()
+        raise SyntaxError
+        
+# Loop
+while True:
+    Voicer()
